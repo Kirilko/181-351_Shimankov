@@ -2,14 +2,12 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 #include <iostream>
-#include <openssl/conf.h> // functions, structures and configurations consts of OpenSSL
+#include <openssl/conf.h> // функции, структуры и константы настройки OpenSSL
 #include <openssl/conf.h>
-#include <openssl/evp.h> // crypto functions themselves https://wiki.openssl.org/index.php/EVP
-#include <openssl/err.h> // inner errors codes of OpenSSL and their decrypt
+#include <openssl/evp.h> // сами криптогрфические функции https://wiki.openssl.org/index.php/EVP
+#include <openssl/err.h> // коды внутренних ошибок OpenSSL и их расшифровка
 #include <openssl/aes.h>
 #include <fstream>
-#include <string>
-#include <cstring>
 
 #pragma comment (lib, "ws2_32.LIB")
 #pragma comment (lib, "gdi32.LIB")
@@ -18,22 +16,21 @@
 #pragma comment (lib, "user32")
 #pragma comment (lib, "wldap32")
 
-//#define BUFLEN 256
-// OpenSSL libraries (openssl.org) are connected not explicitly, dynamicly (see lab 10)
+// библиотеки OpenSSL (openssl.org) подключаются неявно динамически (см. конспект лаб. по библиотекам)
 
 using namespace std;
 
 int main()
 {
-	// woring with cryptofunctions OpenSSL:
-	// 1) creating object with settings
-	// 2) encryption itself
-	// 3) finalization
-	// 4) output of encrypted data
+	// работа с криптофункциями OpenSSL:
+	// 1) создание объекта с настройками
+	// 2) собственно, шифрование
+	// 3) финализация
+	// 4) и вывод зашифрованных данных
 
-	//in literature structures are ussually used only for storing data
-	// not a word about methods constr/destr
-	struct name_of_my_struct // pretty simmular to class
+	// как правило, в литературе, структуры используются для хранения только данных
+	// ни слова о методах и конструкторах/деструкторах
+	struct name_of_my_struct // сродни классу
 	{
 		name_of_my_struct()
 		{
@@ -47,57 +44,56 @@ int main()
 			return a;
 		}
 	};
-	
-	unsigned char plaintext[256];
-	int plaintext_len;// = fread(plaintext, 1, BUFLEN, in); // text length
-	unsigned char *key = (unsigned char *)"0123456789"; // password (key)
-	unsigned char *iv = (unsigned char *)"0123456789012345"; // initialysing vector, randomizer
-	unsigned char cryptedtext[256]; // encrypted result
-	unsigned char decryptedtext[256]; // decrypted result
 
-	// 1. The pointer on a carrying structure is created
+	unsigned char plaintext[256];
+	int plaintext_len = strlen((char *)plaintext); // длина текста
+	unsigned char *key = (unsigned char *)"0123456789"; // пароль (ключ)
+	unsigned char *iv = (unsigned char *)"0123456789012345"; // инициализирующий вектор, рандомайзер
+	unsigned char cryptedtext[256]; // зашифрованный результат
+	unsigned char decryptedtext[256]; // расшифрованный результат
+
+	// 1. Создаётся указатель на несуществующую структуру
+	// структура - тип данных в C++, близка к КЛАССУ, различия минимальны
 	EVP_CIPHER_CTX *ctx; // structure
 
-	// 2. Empty sructure of settings is created for the pointer (method, key, init vector etc)
-	ctx = EVP_CIPHER_CTX_new(); // creating struct with method's settings
+	// 2. Для указателя создаётся пустая структура настроек (метод, ключ, вектор инициализации и т.д.)
+	ctx = EVP_CIPHER_CTX_new(); // создание структуры с настройками метода
 
-	// 3. structure EVP_CIPHER_CTX filled with settings
-	EVP_EncryptInit_ex(ctx, // link on obj/struct to where data is pushed
-		EVP_aes_256_cbc(), // link an a crypting kernel AES 256 (func with algorythm)
+	// 3. Структура EVP_CIPHER_CTX заполняется настройками
+	EVP_EncryptInit_ex(ctx, // ссылка на объект/структуру, куда заносятся параметры
+		EVP_aes_256_cbc(), // ссылка на шифрующее ядро AES 256 (функцию с алгоритмом)
 		NULL,
-		key, // password
-		iv); // randomizer (random starting vector)
+		key, // ключ/пароль/секрет
+		iv); // рандомайзер (случайный начальный вектор)
 
-	// 4. actual encryption - FUNC EVP_EncryptUpdate
+	// 4. САМ ПРОЦЕСС ШИФРОВАНИЯ - ФУКНЦИЯ EVP_EncryptUpdate
 	int len;
 	FILE *in, *out;
 	in = fopen("in.txt", "rb");
 	out = fopen("out.txt", "wb");
-	for (;;)
-	{
+	for (;;) {
 		plaintext_len = fread(plaintext, 1, 256, in);
-		if (plaintext_len <= 0) break;
-		    EVP_EncryptUpdate(ctx, // obj with settings
-			cryptedtext, // out: where will be encrypted data
-			&len, // out: encrypted data length
-			plaintext, // in: data to be encrypted
-			plaintext_len); // in: it's length
-		fwrite(cryptedtext, 1, len, out);
+		if (plaintext_len <= 0) {
+			break;
+		}
+		EVP_EncryptUpdate(ctx, // объект с настройками
+			cryptedtext, // входной параметр: ссылка, куда помещать зашифрованные данные
+			&len, // выходной параметр: длина полученного шифра
+			plaintext, // входной параметр: что шифровать
+			plaintext_len);
+		fwrite(cryptedtext, 1, len, out);// входной параметр : длина входных данных
 	}
 	int cryptedtext_len = len;
 
-	// 5. finalisation of encryption
-	//nessessary if last block of data is not comletely filled
-	EVP_EncryptFinal_ex(ctx, cryptedtext, &len);
+	// 5. Финализация процесса шифрования
+	// необходима, если последний блок заполнен данными не полностью
+	EVP_EncryptFinal_ex(ctx, cryptedtext + len, &len);
 	cryptedtext_len += len;
-	fwrite(cryptedtext, 1, len, out);
 
-	// 6. deleting the structure
+	// 6. Удаление структуры
 	EVP_CIPHER_CTX_free(ctx);
-	fclose(in);
-	fclose(out);
 
-	// output of encrypted data
+	// вывод зашифрованных данных
 	for (int i = 0; i < cryptedtext_len; i++)
 	{
 		cout << hex << cryptedtext[i];
@@ -105,16 +101,16 @@ int main()
 	}
 	cout << endl;
 
-	// decryption
+	// РАСШИФРОВКА
 
 	// 1.
-	ctx = EVP_CIPHER_CTX_new(); // conf struct
+	ctx = EVP_CIPHER_CTX_new(); // создание структуры с настройками метода
 
 	// 2.
-	EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv); // init with AES key & vector
+	EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv); // инициализация методом AES, ключом и вектором
 
 	// 3.
-	EVP_DecryptUpdate(ctx, decryptedtext, &len, cryptedtext, cryptedtext_len);  // decryption
+	EVP_DecryptUpdate(ctx, decryptedtext, &len, cryptedtext, cryptedtext_len);  // СОБСТВЕННО, ШИФРОВАНИЕ
 
 	// 4.
 	int dectypted_len = len;
@@ -126,21 +122,21 @@ int main()
 	decryptedtext[dectypted_len] = '\0';
 	cout << decryptedtext << endl;
 
-	// --- file encryption 
-	// simmular, but done by parts in cycle
-	//
+	// --- шифрование файла
+	// производится точно так же, но порциями, в цикле
+	// в цикле
 	/*
-		1) opening files and setting OpenSSL conf
-		2) reading first block
-		3) while(read_data > 0)
+		1) открытие файлов и настройка параметров OpenSSL
+		2) считывание первого блока
+		3) while(считанный_фрагмент > 0)
 		{
-			4) data encryption
-			5) writing encrypted arr to the file
-			6) reading next block
+			4) шифрование считанного
+			5) запись зашифрованного массива в файл
+			6) считывание следующего фрагмента
 		}
-		7) running finalisation
-		8) writing final to the file
-		9) closing files
+		7) применение финализирующей фукнции
+		8) запись финализирующего блока в файл
+		9) закрытие файлов
 	*/
 	getchar();
 	return 0;
