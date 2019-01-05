@@ -4,8 +4,11 @@
 
 int main(){
 	myClass a;
-	a.input();
+	a.input(); a.print();
+	char b[5]="123";
+	a.add(b);
 	a.print();
+	system("pause");
 	return 0;
 }
 
@@ -68,30 +71,31 @@ void myClass::insert(int pos, char *p1)
 	else {
 		char *a;
 		length += strlen(p1);
-		a = new char[length];
+		a = new char[length+1];
 		for (int i = 0; i < pos; i++) {
 			a[i] = p[i];
 		}
+		a[pos] = '\0';
 		for (int i = pos; i < pos + strlen(p1); i++) {
 			a[i] = p1[i - pos];
 		}
+		a[pos + strlen(p1)] = '\0';
 		for (int i = pos + strlen(p1); i < length; i++) {
 			a[i] = p[i - strlen(p1)];
 		}
-		p = new char[length];
-		for (int i = 0; i < length; i++) {
+		a[length] = '\0';
+		p = new char[length+1];
+		for (int i = 0; i < length+1; i++) {
 			p[i] = a[i];
 		}
 		delete[] a;
 	}
 }
 
-void myClass::cut(int pos, int num)
+//доделать error
+void myClass::cut(int pos, int num)   
 {
-	if ((pos > length)||(num > (length - pos))) {
-		std::cout << "error";
-	}
-	else {
+	if ((pos <= length)||(num <= (length - pos))) {
 		for (int i = pos - 1; i < pos + num - 1; i++) {
 			p[i] = 0;
 		}
@@ -114,6 +118,10 @@ void myClass::cut(int pos, int num)
 			p[i] = a[i];
 		}
 		delete[] a;
+
+	}
+	else {
+		std::cout << "error";
 	}
 }
 
@@ -124,6 +132,7 @@ void myClass::input()
 	for (int i = 0; i < length; i++) {
 		std::cin >> p[i];
 	}
+	p[length] = '\0';
 }
 
 void myClass::print()
