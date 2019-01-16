@@ -1,3 +1,6 @@
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
 #include <iostream>
 #include <string>
 #include "Header.h"
@@ -5,8 +8,9 @@
 int main(){
 	myClass a;
 	a.input(); a.print();
-	char b[5]="123";
-	a.add(b);
+	char b[5]="323";
+	std::string sl("qwe");
+	a.add(sl);
 	a.print();
 	system("pause");
 	return 0;
@@ -60,7 +64,32 @@ void myClass::add(char *p1)
 
 void myClass::add(std::string sl)
 {
-//	strcat(p, sl);
+	 char*q = new char[sl.size()+1];
+	 std::copy(sl.begin(), sl.end(), q);
+	 q[sl.size()] = '\0';
+	 /*q[sl.size()] = '\0';
+	 char*a = new char[length + sl.size()];
+	 for (int i = 0; i < length; i++) {
+		 a[i] = p[i];
+	 }
+	 for (int i = length; i < length+sl.size(); i++) {
+		 a[i] = q[i-length];
+	 }
+	 length += sl.size();
+	 delete[]p;
+	 p = new char[length];
+	 for (int i = 0; i < length; i++) {
+		 p[i] = a[i];
+	 }
+	 delete[]a;*/
+	 length += sl.size()+1;
+	 char*a = new char[length];
+	 strcpy(a, p);
+	 strcat(a,q);
+	 p = new char[length];
+	 strcpy(p, a);
+	 delete[]a;
+	 delete[]q;
 }
 
 void myClass::insert(int pos, char *p1)

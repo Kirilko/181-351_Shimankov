@@ -84,15 +84,17 @@ int main()
 		fwrite(cryptedtext, 1, len, out);// входной параметр : длина входных данных
 	}
 	int cryptedtext_len = len;
-
+	
 	// 5. Финализация процесса шифрования
 	// необходима, если последний блок заполнен данными не полностью
 	EVP_EncryptFinal_ex(ctx, cryptedtext + len, &len);
 	cryptedtext_len += len;
+	fwrite(cryptedtext, 1, len, out);
 
 	// 6. Удаление структуры
 	EVP_CIPHER_CTX_free(ctx);
-
+	fclose(in);
+	fclose(out);
 	// вывод зашифрованных данных
 	for (int i = 0; i < cryptedtext_len; i++)
 	{
@@ -110,17 +112,30 @@ int main()
 	EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv); // инициализация методом AES, ключом и вектором
 
 	// 3.
-	EVP_DecryptUpdate(ctx, decryptedtext, &len, cryptedtext, cryptedtext_len);  // СОБСТВЕННО, ШИФРОВАНИЕ
+	  // СОБСТВЕННО, ШИФРОВАНИЕ
 
 	// 4.
+	FILE *dout;
+	dout = fopen("dout.txt", "wb");
+	out = fopen("out.txt", "rb");
+	for (;;) {
+		cryptedtext_len = fread(cryptedtext, 1, 256, out);
+		if (cryptedtext_len <= 0) {
+			break;
+		}
+		EVP_DecryptUpdate(ctx, decryptedtext, &len, cryptedtext, cryptedtext_len);
+		fwrite(decryptedtext, 1, len, dout);// входной параметр : длина входных данных
+	}
 	int dectypted_len = len;
 	EVP_DecryptFinal_ex(ctx, decryptedtext + len, &len);
-
+	
 	// 5.
 	dectypted_len += len;
 	EVP_CIPHER_CTX_free(ctx);
 	decryptedtext[dectypted_len] = '\0';
-	cout << decryptedtext << endl;
+	fwrite(decryptedtext, 1, len, dout);
+	fclose(out);
+	fclose(dout);
 
 	// --- шифрование файла
 	// производится точно так же, но порциями, в цикле

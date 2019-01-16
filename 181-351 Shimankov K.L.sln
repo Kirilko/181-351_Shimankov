@@ -64,6 +64,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openSSL", "openSSL\openSSL.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Temlates_Trees", "Temlates_Trees\Temlates_Trees.vcxproj", "{C5BAA603-C3C1-4295-90A4-CC83FD92BC87}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.vcxproj", "{4B74DF7A-4F1C-4A99-965E-0C5603C49341}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -288,6 +290,14 @@ Global
 		{C5BAA603-C3C1-4295-90A4-CC83FD92BC87}.Release|x64.Build.0 = Release|x64
 		{C5BAA603-C3C1-4295-90A4-CC83FD92BC87}.Release|x86.ActiveCfg = Release|Win32
 		{C5BAA603-C3C1-4295-90A4-CC83FD92BC87}.Release|x86.Build.0 = Release|Win32
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Debug|x64.ActiveCfg = Debug|x64
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Debug|x64.Build.0 = Debug|x64
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Debug|x86.ActiveCfg = Debug|Win32
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Debug|x86.Build.0 = Debug|Win32
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Release|x64.ActiveCfg = Release|x64
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Release|x64.Build.0 = Release|x64
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Release|x86.ActiveCfg = Release|Win32
+		{4B74DF7A-4F1C-4A99-965E-0C5603C49341}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
