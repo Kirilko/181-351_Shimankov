@@ -10,7 +10,7 @@ int main(){
 	a.input(); a.print();
 	char b[5]="323";
 	std::string sl("qwe");
-	a.add(sl);
+	a.insert(2,sl);
 	a.print();
 	system("pause");
 	return 0;
@@ -67,21 +67,6 @@ void myClass::add(std::string sl)
 	 char*q = new char[sl.size()+1];
 	 std::copy(sl.begin(), sl.end(), q);
 	 q[sl.size()] = '\0';
-	 /*q[sl.size()] = '\0';
-	 char*a = new char[length + sl.size()];
-	 for (int i = 0; i < length; i++) {
-		 a[i] = p[i];
-	 }
-	 for (int i = length; i < length+sl.size(); i++) {
-		 a[i] = q[i-length];
-	 }
-	 length += sl.size();
-	 delete[]p;
-	 p = new char[length];
-	 for (int i = 0; i < length; i++) {
-		 p[i] = a[i];
-	 }
-	 delete[]a;*/
 	 length += sl.size()+1;
 	 char*a = new char[length];
 	 strcpy(a, p);
@@ -118,6 +103,33 @@ void myClass::insert(int pos, char *p1)
 			p[i] = a[i];
 		}
 		delete[] a;
+	}
+}
+
+void myClass::insert(int pos, std::string sl)
+{
+	if (pos > length) {
+		std::cout << "error";
+	}
+	else {
+		char*q = new char[sl.size() + 1];
+		std::copy(sl.begin(), sl.end(), q);
+		q[sl.size()] = '\0';
+		length += sl.length();
+		char*a = new char[length];
+		for (int i = 0; i < pos; i++) {
+			a[i] = p[i];
+		}
+		a[pos] = '\0';
+		strcat(a,q);
+		for (int i = pos + sl.length(); i <length ; i++) {
+			a[i] = p[i - sl.length()];
+		}
+		p = new char[length];
+		strcpy(p, a);
+		delete[]q;
+		delete[]a;
+
 	}
 }
 

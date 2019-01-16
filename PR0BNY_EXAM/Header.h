@@ -14,6 +14,7 @@ public:
 	void add(char *p1);
 	void add(std::string sl);
 	void insert(int pos, char *p1);
+	void insert(int pos, std::string sl);
 	void cut(int pos, int num);
 	void input();
 	void print();
