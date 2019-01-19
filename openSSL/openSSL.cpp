@@ -87,7 +87,7 @@ int main()
 	
 	// 5. Финализация процесса шифрования
 	// необходима, если последний блок заполнен данными не полностью
-	EVP_EncryptFinal_ex(ctx, cryptedtext + len, &len);
+	EVP_EncryptFinal_ex(ctx, cryptedtext, &len);
 	cryptedtext_len += len;
 	fwrite(cryptedtext, 1, len, out);
 
@@ -127,7 +127,7 @@ int main()
 		fwrite(decryptedtext, 1, len, dout);// входной параметр : длина входных данных
 	}
 	int dectypted_len = len;
-	EVP_DecryptFinal_ex(ctx, decryptedtext + len, &len);
+	EVP_DecryptFinal_ex(ctx, decryptedtext, &len);
 	
 	// 5.
 	dectypted_len += len;
