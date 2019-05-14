@@ -1,4 +1,4 @@
-#include "umwindow.h"
+    #include "umwindow.h"
 #include "ui_umwindow.h"
 #include "startwindow.h"
 #include <QDebug>
@@ -14,23 +14,23 @@
 void UMWindow::SetTemp(int temp){
     t = temp;
 }
-UMWindow::UMWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::UMWindow)
-{
-    ui->setupUi(this);
 
+void UMWindow::slot_ready_read(){
+    QByteArray arr;
+    std::string mess;
+    while (socket->bytesAvailable() > 0)
+    {
+        arr = socket->readAll();
+        mess = arr.toStdString();
+    }
+    base.transformStr2BD("Tour", mess);
     QStandardItem *item;
-
     qmodel = new QStandardItemModel(0,4,this);
     ui->tableView->setModel(qmodel);
     qmodel->setHeaderData(0, Qt::Horizontal, "tour");
     qmodel->setHeaderData(1, Qt::Horizontal, "fio");
     qmodel->setHeaderData(2, Qt::Horizontal, "country");
     qmodel->setHeaderData(3, Qt::Horizontal, "magazine");
-
-    DataBase base;
-    base.download1();
         for (int i = 0; i < base.db.size() ; i++)
         {
             item = new QStandardItem(QString::fromStdString(base.db[i].tour));
@@ -45,6 +45,27 @@ UMWindow::UMWindow(QWidget *parent) :
             item = new QStandardItem(QString::fromStdString(base.db[i].mag));
             qmodel->setItem(i, 3, item);
         }
+
+    }
+void UMWindow::slot_send_to_server(QString message){
+    QByteArray array;
+    array.append(message);
+    socket->write(array);
+}
+
+void UMWindow::slot_disconected(){
+}
+UMWindow::UMWindow(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::UMWindow)
+{
+    ui->setupUi(this);
+
+    socket = new QTcpSocket(this);
+    socket->connectToHost("127.0.0.1", 33333);
+    connect(socket, SIGNAL(connected()), SLOT(slot_connected()));
+    connect(socket, SIGNAL(readyRead()), SLOT(slot_ready_read()));
+    slot_send_to_server("show Tour");
 }
 
 UMWindow::~UMWindow()
@@ -61,7 +82,7 @@ void UMWindow::on_actionLogOut_triggered()
 
 void UMWindow::on_actionRefresh_triggered()
 {
-    if(t==2){
+    /*if(t==2){
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("Tour");
     if(!db.open())
@@ -81,7 +102,7 @@ void UMWindow::on_actionRefresh_triggered()
         qmodel->setHeaderData(3, Qt::Horizontal, "magazine");
 
         DataBase base;
-        base.download1();
+        base.download("Tour");
             for (int i = 0; i < base.db.size() ; i++)
             {
                 item = new QStandardItem(QString::fromStdString(base.db[i].tour));
@@ -97,7 +118,8 @@ void UMWindow::on_actionRefresh_triggered()
                 qmodel->setItem(i, 3, item);
             }
 
-    }
+    }*/
+    slot_send_to_server("show Tour");
 }
 
 
@@ -139,9 +161,7 @@ void UMWindow::on_BTNFind_clicked()
     qmodel->setHeaderData(3, Qt::Horizontal, "magazine");
 
     QString temp = ui->lineFIND->text();
-    DataBase base;
-    base.download1();
-    base.finding1(temp.toStdString());
+    base.finding("Tour",temp.toStdString());
         for (int i = 0; i < base.db.size() ; i++)
         {
             item = new QStandardItem(QString::fromStdString(base.db[i].tour));

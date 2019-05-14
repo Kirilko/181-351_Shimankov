@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QSqlTableModel>
 #include <QStandardItemModel>
+#include <QTcpSocket>
+#include "database.h"
 
 
 namespace Ui {
@@ -26,11 +28,16 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+    void slot_send_to_server(QString mess);
+    void slot_disconected();
+    void slot_ready_read();
 
 private:
     Ui::AdminWindow *ui;
     QSqlTableModel *model;
     QStandardItemModel *qmodel;
+    QTcpSocket *socket;
+    DataBase base;
 };
 
 #endif // ADMINWINDOW_H

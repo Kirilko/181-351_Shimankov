@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QSqlTableModel>
 #include <QStandardItemModel>
+#include <QTcpSocket>
+#include "database.h"
 
 namespace Ui {
 class UMWindow;
@@ -30,10 +32,15 @@ private slots:
 
     void on_BTNFind_clicked();
 
+    void slot_send_to_server(QString mess);
+    void slot_disconected();
+    void slot_ready_read();
 private:
     Ui::UMWindow *ui;
     QSqlTableModel *model;
     QStandardItemModel *qmodel;
+    QTcpSocket *socket;
+    DataBase base;
 };
 
 #endif // UMWINDOW_H

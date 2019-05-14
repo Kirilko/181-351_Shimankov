@@ -14,10 +14,49 @@ AdminWindow::AdminWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-emit on_actionRefresh_triggered();
+    socket = new QTcpSocket(this);
+    socket->connectToHost("127.0.0.1", 33333);
+    connect(socket, SIGNAL(connected()), SLOT(slot_connected()));
+    connect(socket, SIGNAL(readyRead()), SLOT(slot_ready_read()));
+    slot_send_to_server("show Test");
+}
+void AdminWindow::slot_ready_read(){
+    QByteArray arr;
+    std::string mess;
+    while (socket->bytesAvailable() > 0)
+    {
+        arr = socket->readAll();
+        mess = arr.toStdString();
+    }
+    base.transformStr2BD("Test", mess);
+    QStandardItem *item;
 
+    qmodel = new QStandardItemModel(0,3,this);
+    ui->tableView->setModel(qmodel);
+    qmodel->setHeaderData(0, Qt::Horizontal, "login");
+    qmodel->setHeaderData(1, Qt::Horizontal, "password");
+    qmodel->setHeaderData(2, Qt::Horizontal, "level");
+    for (int i = 0; i < base.db.size() ; i++)
+    {
+        item = new QStandardItem(QString::fromStdString(base.db[i].tour));
+        qmodel->setItem(i, 0, item);
+
+        item = new QStandardItem(QString::fromStdString(base.db[i].fio));
+        qmodel->setItem(i, 1, item);
+
+        item = new QStandardItem(QString::fromStdString(base.db[i].coun));
+        qmodel->setItem(i, 2, item);
+    }
+}
+void AdminWindow::slot_send_to_server(QString message){
+    QByteArray array;
+    array.append(message);
+    socket->write(array);
 }
 
+void AdminWindow::slot_disconected(){
+
+}
 AdminWindow::~AdminWindow()
 {
     delete ui;
@@ -32,7 +71,7 @@ void AdminWindow::on_actionLogOut_triggered()
 
 void AdminWindow::on_actionRefresh_triggered()
 {
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    /*QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("Test");
     if(!db.open())
         qDebug()<<db.lastError().text();
@@ -47,7 +86,8 @@ void AdminWindow::on_actionRefresh_triggered()
     model = new QSqlTableModel(this, db);
     model->setTable("User");
     model->select();
-    ui->tableView->setModel(model);
+    ui->tableView->setModel(model);*/
+    slot_send_to_server("show Test");
 }
 
 void AdminWindow::on_pushButton_2_clicked()
@@ -62,9 +102,7 @@ void AdminWindow::on_pushButton_2_clicked()
     qmodel->setHeaderData(2, Qt::Horizontal, "level");
 
     QString temp = ui->lineEdit->text();
-    DataBase base;
-    base.download();
-    base.finding(temp.toStdString());
+    base.finding("Test",temp.toStdString());
         for (int i = 0; i < base.db.size() ; i++)
         {
             item = new QStandardItem(QString::fromStdString(base.db[i].tour));
@@ -80,13 +118,15 @@ void AdminWindow::on_pushButton_2_clicked()
 
 void AdminWindow::on_pushButton_clicked()
 {
-    struct data word;
     QString t = ui->lineEdit_3->text();
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    /*QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
         db.setDatabaseName("Test");
         if(!db.open())
             qDebug()<<db.lastError().text();
         QSqlQuery query(db);
     std::string temp = "DELETE FROM User WHERE login = '"+t.toStdString()+"'";
     query.exec(QString::fromStdString(temp));
+    emit on_actionRefresh_triggered();
+    */
+    slot_send_to_server("delete Test "+ t);
 }

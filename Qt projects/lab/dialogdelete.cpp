@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QMessageBox>
+#include "umwindow.h"
 
 void DialogDelete::SetTemp(int temp){
     te = temp;
@@ -70,8 +71,8 @@ void DialogDelete::on_buttonBox_accepted()
             if((query.value(0).toString()==t.toLocal8Bit().constData())&&(query.value(1).toString()==f.toLocal8Bit().constData())
                     &&(query.value(2).toString()==c.toLocal8Bit().constData())&&(query.value(3).toString()==m.toLocal8Bit().constData())){
                 temp = 1;
-        std::string temp = "DELETE FROM User WHERE tour = '"+t.toStdString()+"' AND fio = '"+f.toStdString()+"' AND country = '"+c.toStdString()+"' AND magazine = '"+m.toStdString()+"'";
-        query.exec(QString::fromStdString(temp));
+        std::string tem = "DELETE FROM User WHERE tour = '"+t.toStdString()+"' AND fio = '"+f.toStdString()+"' AND country = '"+c.toStdString()+"' AND magazine = '"+m.toStdString()+"'";
+        query.exec(QString::fromStdString(tem));
         msgBox.setText("Data deleted");
         msgBox.exec();
             }

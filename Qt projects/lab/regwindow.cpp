@@ -14,8 +14,28 @@ RegWindow::RegWindow(QWidget *parent) :
     ui(new Ui::RegWindow)
 {
     ui->setupUi(this);
+
+    socket = new QTcpSocket(this);
+        socket->connectToHost("127.0.0.1", 33333);
+        connect(socket, SIGNAL(connected()), SLOT(slot_connected()));
+        connect(socket, SIGNAL(readyRead()), SLOT(slot_ready_read()));
 }
 
+void RegWindow::slot_connected()
+{
+    QMessageBox msgBox;
+    msgBox.setText("You are on the server");
+    msgBox.exec();
+}
+void RegWindow::slot_send_to_server(QString message){
+    QByteArray array;
+    array.append(message);
+    socket->write(array);
+}
+
+void RegWindow::slot_disconected(){
+
+}
 RegWindow::~RegWindow()
 {
     delete ui;
@@ -31,7 +51,7 @@ void RegWindow::on_actionBack_triggered()
 void RegWindow::on_pushButtonLog_clicked()
 {
     QMessageBox msgBox;
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    /*QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("Test");
     if(!db.open())
         qDebug()<<db.lastError().text();
@@ -41,7 +61,7 @@ void RegWindow::on_pushButtonLog_clicked()
                "password VARCHAR(20) NOT NULL,"
                "level VARCHAR(20) NOT NULL"
                ")");
-
+*/
     QString login = ui->lineEdit_log_2->text();
     QString password = ui->lineEdit_pass_2->text();
     /*query.bindValue(":login","admin");
@@ -56,7 +76,7 @@ void RegWindow::on_pushButtonLog_clicked()
     query.bindValue(":password","1");
     query.bindValue(":level","3");
     query.exec();*/
-    int temp=0;
+    /*int temp=0;
     query.exec("SELECT * FROM User");
         while(query.next())
             if(query.value(0).toString()==login.toLocal8Bit().constData()){
@@ -74,5 +94,13 @@ void RegWindow::on_pushButtonLog_clicked()
         msgBox.setText("Succesful");
         msgBox.exec();
     }
-    db.close();
+    db.close();*/
+    if(login == NULL || password == NULL){
+        msgBox.setText("Fill empty areas");
+        msgBox.exec();
+    }else{
+    QString message;
+        message = "registration " + login + " " + password;
+        slot_send_to_server(message);
+    }
 }
