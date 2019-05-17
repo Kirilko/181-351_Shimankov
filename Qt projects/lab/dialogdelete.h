@@ -2,6 +2,7 @@
 #define DIALOGDELETE_H
 
 #include <QDialog>
+#include <QTcpSocket>
 
 namespace Ui {
 class DialogDelete;
@@ -20,8 +21,13 @@ public:
 private slots:
     void on_buttonBox_accepted();
 
+    void slot_send_to_server(QString mess);
+    void slot_disconected();
+    void slot_ready_read();
+
 private:
     Ui::DialogDelete *ui;
+    QTcpSocket *socket;
 };
 
 #endif // DIALOGDELETE_H

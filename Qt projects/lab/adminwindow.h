@@ -32,6 +32,8 @@ private slots:
     void slot_disconected();
     void slot_ready_read();
 
+    void on_pushButton_3_clicked();
+
 private:
     Ui::AdminWindow *ui;
     QSqlTableModel *model;

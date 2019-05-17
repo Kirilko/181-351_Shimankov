@@ -26,6 +26,7 @@ private slots:
     void slot_connected();
     void slot_send_to_server(QString mess);
     void slot_disconected();
+    void slot_ready_read();
 
 private:
     Ui::RegWindow *ui;

@@ -130,3 +130,9 @@ void AdminWindow::on_pushButton_clicked()
     */
     slot_send_to_server("delete Test "+ t);
 }
+
+void AdminWindow::on_pushButton_3_clicked()
+{
+    QString t = ui->lineEdit_3->text();
+    slot_send_to_server("change "+ t);
+}

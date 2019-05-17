@@ -15,8 +15,8 @@ struct data{
     std::string mag;
 };
 
-bool checkFio(std::string fio);
-bool checkCoun(std::string coun);
+std::string checkFio(std::string fio);
+void checkCoun(std::string coun);
 class DataBase
 {
 public:

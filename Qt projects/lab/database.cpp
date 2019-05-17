@@ -1,10 +1,27 @@
 #include "database.h"
 #include <sstream>
-
+#include <cctype>
 DataBase::DataBase()
 {
 }
-
+std::string checkFio(std::string fio){
+    QString up = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    QString down = "abcdefghijklmnopqrstuvwxyz";
+    if(!(up.contains(fio[0]))){
+            if(down.contains(fio[0]))
+                fio[0]=toupper(fio[0]);
+            else return "1";
+    }
+    for(int i = 1;i<fio.length();i++){
+            if(!(down.contains(fio[i]))){
+                if(up.contains(fio[i]))
+                    fio[i]= tolower(fio[i]);
+                else return "1";
+            }
+    }
+    qDebug() << QString::fromStdString(fio);
+    return fio;
+}
 bool DataBase::add_data(data tempData)
 {
     db.push_back(tempData);

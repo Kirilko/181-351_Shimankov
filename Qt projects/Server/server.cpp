@@ -103,7 +103,39 @@ void Server::slotReadClient()
                  << "level = " << authorizing(QString::fromStdString(log),QString::fromStdString(pass));
         slotSendToCLient(authorizing(QString::fromStdString(log),QString::fromStdString(pass)));
     } else if(action=="add"){
-
+        int temp = 0;
+        QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+                db.setDatabaseName("Tour");
+                if(!db.open())
+                    qDebug()<<db.lastError().text();
+        QSqlQuery query(db);
+        pos = message.find(" ");
+        QString t = QString::fromStdString(message.substr(0, pos));
+        message.erase(0, pos + 1);
+        pos = message.find(" ");
+        QString f = QString::fromStdString(message.substr(0, pos));
+        message.erase(0, pos + 1);
+        pos = message.find(" ");
+        QString c = QString::fromStdString(message.substr(0, pos));
+        message.erase(0, pos + 1);
+        QString m = QString::fromStdString(message);
+        query.exec("SELECT * FROM User");
+        while(query.next())
+             if((query.value(0).toString()==t.toLocal8Bit().constData())&&(query.value(1).toString()==f.toLocal8Bit().constData())
+                     &&(query.value(2).toString()==c.toLocal8Bit().constData())&&(query.value(3).toString()==m.toLocal8Bit().constData())){
+                 temp=1;
+              }
+        if(temp==0){
+            query.prepare("INSERT INTO User(tour, fio, country, magazine) "
+                              "VALUES (:tour, :fio, :country, :magazine)");
+            query.bindValue(":tour",t);
+            query.bindValue(":fio",f);
+            query.bindValue(":country",c);
+            query.bindValue(":magazine",m);
+            query.exec();
+        }
+        db.close();
+        slotSendToCLient(QString::number(temp));
     } else if(action == "registration"){
         pos = message.find(" ");
         QString log = QString::fromStdString(message.substr(0, pos));
@@ -134,6 +166,7 @@ void Server::slotReadClient()
                              << "level = " << 3;
                 }
                 db.close();
+                slotSendToCLient(QString::number(temp));
     } else if (action=="show") {
         std::string t;
         DataBase base;
@@ -144,19 +177,59 @@ void Server::slotReadClient()
         pos = message.find(" ");
         QString name = QString::fromStdString(message.substr(0, pos));
         message.erase(0, pos + 1);
-        std::string del = message;
-        qDebug() << name << QString::fromStdString(del);
         if(name=="Test"){
+            pos = message.find(" ");
+            QString del =QString::fromStdString(message.substr(0, pos));
             QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-                    db.setDatabaseName("Test");
-                    if(!db.open())
-                        qDebug()<<db.lastError().text();
-                    QSqlQuery query(db);
-                std::string temp = "DELETE FROM User WHERE login = '"+del+"'";
-                query.exec(QString::fromStdString(temp));
+            db.setDatabaseName("Test");
+            if(!db.open())
+               qDebug()<<db.lastError().text();
+            QSqlQuery query(db);
+            std::string temp = "DELETE FROM User WHERE login = '"+del.toStdString()+"'";
+            query.exec(QString::fromStdString(temp));
         }else if(name=="Tour"){
-
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+            db.setDatabaseName("Tour");
+            if(!db.open())
+                qDebug()<<db.lastError().text();
+            QSqlQuery query(db);
+            pos = message.find(" ");
+            QString t = QString::fromStdString(message.substr(0, pos));
+            message.erase(0, pos + 1);
+            pos = message.find(" ");
+            QString f = QString::fromStdString(message.substr(0, pos));
+            message.erase(0, pos + 1);
+            pos = message.find(" ");
+            QString c = QString::fromStdString(message.substr(0, pos));
+            message.erase(0, pos + 1);
+            QString m = QString::fromStdString(message);
+            std::string tem = "DELETE FROM User WHERE tour = '"+t.toStdString()+"' AND fio = '"+f.toStdString()+"' AND country = '"+c.toStdString()+"' AND magazine = '"+m.toStdString()+"'";
+            query.exec(QString::fromStdString(tem));
+            db.close();
+        }
+    } else if(action == "change"){
+        QString change =QString::fromStdString(message);
+        qDebug() << change;
+        if(change!="admin"){
+            QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+            db.setDatabaseName("Test");
+            if(!db.open())
+               qDebug()<<db.lastError().text();
+            QSqlQuery query(db);
+            std::string temp;
+            query.exec("SELECT * FROM User");
+            while(query.next()){
+                if(query.value(0).toString()==change){
+                    if(query.value(2).toString()=="3")
+                        temp = "UPDATE User SET level = 2 WHERE login = '" +change.toStdString()+"'";
+                    else if (query.value(2).toString()=="2")
+                        temp = "UPDATE User SET level = 3 WHERE login = '" +change.toStdString()+"'";
+                    query.exec(QString::fromStdString(temp));
+                }
+                }
+            db.close();
+            }
         }
     }
-}
+
 

@@ -32,7 +32,23 @@ void RegWindow::slot_send_to_server(QString message){
     array.append(message);
     socket->write(array);
 }
-
+void RegWindow::slot_ready_read(){
+    QByteArray arr;
+    int mess;
+    QMessageBox msgBox;
+    while (socket->bytesAvailable() > 0)
+    {
+        arr = socket->readAll();
+        mess = arr.toInt();
+    }
+    if(mess==0){
+        msgBox.setText("Registred");
+        msgBox.exec();
+    } else if (mess==1){
+        msgBox.setText("This username already used");
+        msgBox.exec();
+    }
+}
 void RegWindow::slot_disconected(){
 
 }
