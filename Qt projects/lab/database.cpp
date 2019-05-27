@@ -19,7 +19,6 @@ std::string checkFio(std::string fio){
                 else return "1";
             }
     }
-    qDebug() << QString::fromStdString(fio);
     return fio;
 }
 bool DataBase::add_data(data tempData)

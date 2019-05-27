@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
+#include "crypto.h"
 
 AdminWindow::AdminWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -20,14 +21,18 @@ AdminWindow::AdminWindow(QWidget *parent) :
     connect(socket, SIGNAL(readyRead()), SLOT(slot_ready_read()));
     slot_send_to_server("show Test");
 }
+std::string mess;
 void AdminWindow::slot_ready_read(){
-    QByteArray arr;
-    std::string mess;
+    QByteArray arr,arr_d;
+
     while (socket->bytesAvailable() > 0)
     {
         arr = socket->readAll();
-        mess = arr.toStdString();
+
     }
+    crypto c;
+    arr_d = c.decrypt(arr);
+    mess = arr_d.toStdString();
     base.transformStr2BD("Test", mess);
     QStandardItem *item;
 
@@ -49,9 +54,11 @@ void AdminWindow::slot_ready_read(){
     }
 }
 void AdminWindow::slot_send_to_server(QString message){
-    QByteArray array;
+    QByteArray array,array_d;
     array.append(message);
-    socket->write(array);
+    crypto c;
+    array_d = c.encrypt(array);
+    socket->write(array_d);
 }
 
 void AdminWindow::slot_disconected(){
@@ -68,7 +75,7 @@ void AdminWindow::on_actionLogOut_triggered()
     this->close();
     w->show();
 }
-
+QStandardItem *item;
 void AdminWindow::on_actionRefresh_triggered()
 {
     /*QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -87,13 +94,25 @@ void AdminWindow::on_actionRefresh_triggered()
     model->setTable("User");
     model->select();
     ui->tableView->setModel(model);*/
+    base.finding("Tour"," ");
+    for (int i = 0; i < base.db.size() ; i++)
+    {
+        item = new QStandardItem(QString::fromStdString(base.db[i].tour));
+        qmodel->setItem(i, 0, item);
+
+        item = new QStandardItem(QString::fromStdString(base.db[i].fio));
+        qmodel->setItem(i, 1, item);
+
+        item = new QStandardItem(QString::fromStdString(base.db[i].coun));
+        qmodel->setItem(i, 2, item);
+    }
     slot_send_to_server("show Test");
 }
 
 void AdminWindow::on_pushButton_2_clicked()
 {
 
-    QStandardItem *item;
+
 
     qmodel = new QStandardItemModel(0,3,this);
     ui->tableView->setModel(qmodel);

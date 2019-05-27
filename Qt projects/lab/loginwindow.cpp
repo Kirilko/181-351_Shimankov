@@ -11,6 +11,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QMessageBox>
+#include "crypto.h"
 
 LoginWindow::LoginWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,18 +32,20 @@ void LoginWindow::slot_connected()
 }
 
 void LoginWindow::slot_ready_read(){
-    QByteArray arr;
+    QByteArray arr,arr_d;
     std::string mess;
     QMessageBox msgBox;
     while (socket->bytesAvailable() > 0)
     {
         arr = socket->readAll();
-        mess = arr.toStdString();
     }
+
+    crypto c;
+    arr_d = c.decrypt(arr);
+    mess = arr_d.toStdString();
     /*QMessageBox m;
     m.setText(QString::fromStdString(mess));
     m.exec();*/
-
     if (mess == "1")
     {
         AdminWindow *m = new AdminWindow();
@@ -91,9 +94,11 @@ void LoginWindow::slot_ready_read(){
 }
 
 void LoginWindow::slot_send_to_server(QString message){
-    QByteArray array;
+    QByteArray array,arr_d;
     array.append(message);
-    socket->write(array);
+    crypto c;
+    arr_d = c.encrypt(array);
+    socket->write(arr_d);
 }
 
 void LoginWindow::slot_disconected(){

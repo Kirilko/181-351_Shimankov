@@ -9,6 +9,7 @@
 #include <QSqlRecord>
 #include <QMessageBox>
 #include "umwindow.h"
+#include "crypto.h"
 
 void DialogDelete::SetTemp(int temp){
     te = temp;
@@ -32,23 +33,28 @@ DialogDelete::~DialogDelete()
 }
 
 void DialogDelete::slot_send_to_server(QString message){
-    QByteArray array;
+    QByteArray array,array_d;
     array.append(message);
-    socket->write(array);
+    crypto c;
+    array_d = c.encrypt(array);
+    socket->write(array_d);
 }
 
 void DialogDelete::slot_disconected(){
 
 }
 void DialogDelete::slot_ready_read(){
-    QByteArray arr;
+    QByteArray arr,arr_d;
     int mess;
     QMessageBox msgBox;
     while (socket->bytesAvailable() > 0)
     {
         arr = socket->readAll();
-        mess = arr.toInt();
+
     }
+    crypto c;
+    arr_d = c.decrypt(arr);
+    mess = arr.toInt();
     if(mess==0){
         msgBox.setText("Data added");
         msgBox.exec();
@@ -60,17 +66,7 @@ void DialogDelete::slot_ready_read(){
 void DialogDelete::on_buttonBox_accepted()
 {
     QMessageBox msgBox;
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("Tour");
-    if(!db.open())
-        qDebug()<<db.lastError().text();
-    QSqlQuery query(db);
-    query.exec("CREATE TABLE User("
-               "tour VARCHAR(20) NOT NULL, "
-               "fio VARCHAR(20) NOT NULL,"
-               "country VARCHAR(20) NOT NULL,"
-               "magazine VARCHAR(20) NOT NULL"
-               ")");
+
 
     QString t = ui->lineTour->text();
     QString f = ui->lineFIO->text();
@@ -81,7 +77,6 @@ void DialogDelete::on_buttonBox_accepted()
             c = QString::fromStdString(checkFio(c.toStdString()));
             QString m = ui->lineMag->text();
             int temp;
-            query.exec("SELECT * FROM User");
             if(te==1){
                 slot_send_to_server("add "+t+" "+f+" "+c+" "+m);
             } else if(te==2){
@@ -95,5 +90,4 @@ void DialogDelete::on_buttonBox_accepted()
         msgBox.setText("Check data");
         msgBox.exec();
     }
-    db.close();
 }

@@ -28,7 +28,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        TinyAES.cpp \
         adminwindow.cpp \
+        crypto.cpp \
         database.cpp \
         dialogdelete.cpp \
         loginwindow.cpp \
@@ -38,11 +40,14 @@ SOURCES += \
         umwindow.cpp
 
 HEADERS += \
+        TinyAES.h \
         adminwindow.h \
+        crypto.h \
         database.h \
         dialogdelete.h \
         loginwindow.h \
         regwindow.h \
+        sslserver.h \
         startwindow.h \
         umwindow.h
 
@@ -58,3 +63,9 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32: LIBS += -LC:/Users/Dell/Desktop/ssl/ -llibcrypto
+       LIBS += -LC:/Users/Dell/Desktop/ssl/ -llibssl
+
+INCLUDEPATH += C:/Users/Dell/Desktop/ssl/include
+DEPENDPATH += C:/Users/Dell/Desktop/ssl/include

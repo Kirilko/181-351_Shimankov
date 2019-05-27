@@ -20,6 +20,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         ../lab/database.cpp \
+        TinyAES.cpp \
+        crypto.cpp \
         main.cpp \
         server.cpp
 
@@ -30,4 +32,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     ../lab/database.h \
+    TinyAES.h \
+    crypto.h \
     server.h

@@ -6,7 +6,8 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QVariant>
-
+#include "crypto.h"
+#include <QCryptographicHash>
 
 Server::Server(QObject *parent)
     : QObject(parent)
@@ -69,9 +70,11 @@ void Server::slotSendToCLient(QString mess)
 {
     QObject * object = QObject::sender();
     QTcpSocket * socket = static_cast<QTcpSocket *>(object);
-    QByteArray arr;
+    QByteArray arr,arr_d;
     arr.append(mess);
-    socket->write(arr);
+    crypto c;
+    arr_d = c.encrypt(arr);
+    socket->write(arr_d);
 }
 
 void Server::slotReadClient()
@@ -79,9 +82,10 @@ void Server::slotReadClient()
     QTcpSocket *clientSocket = (QTcpSocket*)sender();
     int id = (int)clientSocket->socketDescriptor();
     QByteArray array = clientSocket->readAll();
-    std::string log,pass;
+    crypto c;
+    QByteArray array_d = c.decrypt(array);
     std::string message;
-    message = array.toStdString();
+    message = array_d.toStdString();
     qDebug() << QString::fromStdString(message);
     int pos = message.find(" ");
     //std::string name_of_func = message.substr(0,pos);
@@ -89,7 +93,7 @@ void Server::slotReadClient()
     message.erase(0,pos+1);
     if(action=="authorize")
     {
-
+        std::string log,pass;
         pos=message.find(" ");
         log = message.substr(0,pos);
         message.erase(0,pos+1);
@@ -143,6 +147,13 @@ void Server::slotReadClient()
         pos = message.find(" ");
         QString pass = QString::fromStdString(message.substr(0, pos));
         message.erase(0, pos + 1);
+       //QByteArray hash, hpass;
+       //hpass.append(pass);
+       //hash = QCryptographicHash::hash(hpass, QCryptographicHash::Md5);
+        //hpass.clear();
+        //for(int i = 0; i< hash.size();i++){
+          //  hpass.append(hash[i]);
+        //}
         QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
             db.setDatabaseName("Test");
             if(!db.open())
@@ -155,9 +166,10 @@ void Server::slotReadClient()
                             temp=1;
                         }
                 if(temp==0){
-                    query.prepare("INSERT INTO User(login, password, level) "
+                    query.prepare("INSERT INTO User(login, password, level)"
                                       "VALUES (:login, :password, :level)");
                     query.bindValue(":login",log);
+                    //query.bindValue(":password",hpass);
                     query.bindValue(":password",pass);
                     query.bindValue(":level","3");
                     query.exec();

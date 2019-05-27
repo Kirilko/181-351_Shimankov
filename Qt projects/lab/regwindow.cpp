@@ -8,6 +8,7 @@
 #include <QSqlError>
 #include <QSqlRecord>
 #include <QMessageBox>
+#include "crypto.h"
 
 RegWindow::RegWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,19 +29,24 @@ void RegWindow::slot_connected()
     msgBox.exec();
 }
 void RegWindow::slot_send_to_server(QString message){
-    QByteArray array;
+    QByteArray array,array_d;
     array.append(message);
-    socket->write(array);
+    crypto c;
+    array_d = c.encrypt(array);
+    socket->write(array_d);
 }
 void RegWindow::slot_ready_read(){
-    QByteArray arr;
+    QByteArray arr,arr_d;
     int mess;
     QMessageBox msgBox;
     while (socket->bytesAvailable() > 0)
     {
         arr = socket->readAll();
-        mess = arr.toInt();
+
     }
+    crypto c;
+    arr_d = c.decrypt(arr);
+    mess = arr_d.toInt();
     if(mess==0){
         msgBox.setText("Registred");
         msgBox.exec();

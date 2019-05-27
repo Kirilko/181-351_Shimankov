@@ -10,19 +10,23 @@
 #include "database.h"
 #include "dialogdelete.h"
 #include <QMessageBox>
+#include "crypto.h"
 
 void UMWindow::SetTemp(int temp){
     t = temp;
 }
 
 void UMWindow::slot_ready_read(){
-    QByteArray arr;
+    QByteArray arr,arr_d;
     std::string mess;
     while (socket->bytesAvailable() > 0)
     {
         arr = socket->readAll();
-        mess = arr.toStdString();
+
     }
+    crypto c;
+    arr_d = c.decrypt(arr);
+    mess = arr_d.toStdString();
     base.transformStr2BD("Tour", mess);
     QStandardItem *item;
     qmodel = new QStandardItemModel(0,4,this);
@@ -48,9 +52,11 @@ void UMWindow::slot_ready_read(){
 
     }
 void UMWindow::slot_send_to_server(QString message){
-    QByteArray array;
+    QByteArray array, array_d;
     array.append(message);
-    socket->write(array);
+    crypto c;
+    array_d = c.encrypt(array);
+    socket->write(array_d);
 }
 
 void UMWindow::slot_disconected(){
@@ -63,7 +69,6 @@ UMWindow::UMWindow(QWidget *parent) :
 
     socket = new QTcpSocket(this);
     socket->connectToHost("127.0.0.1", 33333);
-    connect(socket, SIGNAL(connected()), SLOT(slot_connected()));
     connect(socket, SIGNAL(readyRead()), SLOT(slot_ready_read()));
     slot_send_to_server("show Tour");
 }
@@ -79,7 +84,7 @@ void UMWindow::on_actionLogOut_triggered()
    this->close();
    w->show();
 }
-
+QStandardItem *titem;
 void UMWindow::on_actionRefresh_triggered()
 {
     /*if(t==2){
@@ -119,6 +124,21 @@ void UMWindow::on_actionRefresh_triggered()
             }
 
     }*/
+    base.finding("Tour"," ");
+    for (int i = 0; i < base.db.size() ; i++)
+    {
+        titem = new QStandardItem(QString::fromStdString(base.db[i].tour));
+        qmodel->setItem(i, 0, titem);
+
+        titem = new QStandardItem(QString::fromStdString(base.db[i].fio));
+        qmodel->setItem(i, 1, titem);
+
+        titem = new QStandardItem(QString::fromStdString(base.db[i].coun));
+        qmodel->setItem(i, 2, titem);
+
+        titem = new QStandardItem(QString::fromStdString(base.db[i].mag));
+        qmodel->setItem(i, 3, titem);
+    }
     slot_send_to_server("show Tour");
 }
 
@@ -151,7 +171,7 @@ void UMWindow::on_actionDelete_triggered()
 
 void UMWindow::on_BTNFind_clicked()
 {
-    QStandardItem *item;
+
 
     qmodel = new QStandardItemModel(0,4,this);
     ui->tableView->setModel(qmodel);
@@ -164,16 +184,16 @@ void UMWindow::on_BTNFind_clicked()
     base.finding("Tour",temp.toStdString());
         for (int i = 0; i < base.db.size() ; i++)
         {
-            item = new QStandardItem(QString::fromStdString(base.db[i].tour));
-            qmodel->setItem(i, 0, item);
+            titem = new QStandardItem(QString::fromStdString(base.db[i].tour));
+            qmodel->setItem(i, 0, titem);
 
-            item = new QStandardItem(QString::fromStdString(base.db[i].fio));
-            qmodel->setItem(i, 1, item);
+            titem = new QStandardItem(QString::fromStdString(base.db[i].fio));
+            qmodel->setItem(i, 1, titem);
 
-            item = new QStandardItem(QString::fromStdString(base.db[i].coun));
-            qmodel->setItem(i, 2, item);
+            titem = new QStandardItem(QString::fromStdString(base.db[i].coun));
+            qmodel->setItem(i, 2, titem);
 
-            item = new QStandardItem(QString::fromStdString(base.db[i].mag));
-            qmodel->setItem(i, 3, item);
+            titem = new QStandardItem(QString::fromStdString(base.db[i].mag));
+            qmodel->setItem(i, 3, titem);
         }
 }
