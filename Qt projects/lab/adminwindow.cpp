@@ -31,7 +31,7 @@ void AdminWindow::slot_ready_read(){
 
     }
     crypto c;
-    arr_d = c.decrypt(arr);
+    arr_d = c.decryptAES(c.passphrase.toLatin1(),arr);
     mess = arr_d.toStdString();
     base.transformStr2BD("Test", mess);
     QStandardItem *item;
@@ -57,7 +57,7 @@ void AdminWindow::slot_send_to_server(QString message){
     QByteArray array,array_d;
     array.append(message);
     crypto c;
-    array_d = c.encrypt(array);
+    array_d = c.encryptAES(c.passphrase.toLatin1(),array);
     socket->write(array_d);
 }
 

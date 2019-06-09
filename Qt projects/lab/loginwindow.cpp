@@ -41,7 +41,8 @@ void LoginWindow::slot_ready_read(){
     }
 
     crypto c;
-    arr_d = c.decrypt(arr);
+   // arr_d = c.decrypt(arr);
+    arr_d = c.decryptAES(c.passphrase.toLatin1(),arr);
     mess = arr_d.toStdString();
     /*QMessageBox m;
     m.setText(QString::fromStdString(mess));
@@ -97,7 +98,8 @@ void LoginWindow::slot_send_to_server(QString message){
     QByteArray array,arr_d;
     array.append(message);
     crypto c;
-    arr_d = c.encrypt(array);
+    //arr_d = c.encrypt(array);
+    arr_d=c.encryptAES(c.passphrase.toLatin1(),array);
     socket->write(arr_d);
 }
 
