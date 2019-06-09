@@ -73,7 +73,7 @@ void Server::slotSendToCLient(QString mess)
     QByteArray arr,arr_d;
     arr.append(mess);
     crypto c;
-    arr_d = c.encrypt(arr);
+    arr_d = c.encryptAES(c.passphrase.toLatin1(),arr);
     socket->write(arr_d);
 }
 
@@ -83,7 +83,7 @@ void Server::slotReadClient()
     int id = (int)clientSocket->socketDescriptor();
     QByteArray array = clientSocket->readAll();
     crypto c;
-    QByteArray array_d = c.decrypt(array);
+    QByteArray array_d = c.decryptAES(c.passphrase.toLatin1(),array);
     std::string message;
     message = array_d.toStdString();
     qDebug() << QString::fromStdString(message);

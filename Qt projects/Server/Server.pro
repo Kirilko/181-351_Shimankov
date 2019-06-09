@@ -35,3 +35,13 @@ HEADERS += \
     TinyAES.h \
     crypto.h \
     server.h
+# Default rules for deployment.
+qnx: target.path = /tmp/$${TARGET}/bin
+else: unix:!android: target.path = /opt/$${TARGET}/bin
+!isEmpty(target.path): INSTALLS += target
+
+win32: LIBS += -LC:/Users/Dell/Desktop/ssl/ -llibcrypto
+       LIBS += -LC:/Users/Dell/Desktop/ssl/ -llibssl
+
+INCLUDEPATH += C:/Users/Dell/Desktop/ssl/include
+DEPENDPATH += C:/Users/Dell/Desktop/ssl/include
